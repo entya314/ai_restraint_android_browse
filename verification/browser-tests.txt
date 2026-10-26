@@ -1,0 +1,11 @@
+PASS 普通の名前・備考・人数と「検索」文言だけの欄は編集できる
+PASS type=search、searchbox、search role内、search要素内を無効化
+PASS 動的追加と属性変更に追従し、検索指定解除後は普通の入力に戻す
+PASS Shadow DOM内に追加した明示的検索欄も禁止
+PASS 通常POSTは名前・備考・人数・submitterを保持してネイティブ仲介し、検索欄は送信しない
+PASS SPA側でpreventDefaultした送信を二重送信しない
+PASS form.submit()もネイティブに仲介
+PASS 外部formaction、外部POST action、外部リンク、intent、別窓は禁止
+PASS form属性で外部に紐付く検索欄も同じタスク内のsubmit前に除外
+PASS 同じホストへのリンク移動は維持
+10 browser tests passed; Chromium 154.0.8037.57
