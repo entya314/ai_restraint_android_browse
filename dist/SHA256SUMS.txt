@@ -1,0 +1,2 @@
+dab81c097c336873045039126228a2d3d50491e349c1d883026a489162c4319d  dist/restricted-browser-instrumentation.apk
+515f70743c24a79fb6c5a0df0f187418055e7ce1e85be7e064115bc7b852ecb7  dist/restricted-browser-test.apk

@@ -128,13 +128,16 @@
     if (!allowed(info.url) || (info.target && info.target !== '_self') || semanticAncestor(form) || !isTop) {
       e.preventDefault(); e.stopImmediatePropagation(); refuse(); return;
     }
-    // Cancel the browser's native submission; let SPA handlers cancel our mediated submission too.
-    if (e.defaultPrevented) return;
+  }, true);
+  // Run after form/document handlers so SPA logic sees the original defaultPrevented state.
+  window.addEventListener('submit', e => {
+    const form = e.target;
+    if (formInfo(form, e.submitter).method === 'dialog' || e.defaultPrevented) return;
     let pageCanceled = false;
     const nativePrevent = e.preventDefault.bind(e);
     nativePrevent();
     e.preventDefault = () => { pageCanceled = true; nativePrevent(); };
     setTimeout(() => { if (!pageCanceled) sendForm(form, e.submitter); }, 0);
-  }, true);
+  });
   HTMLFormElement.prototype.submit = function() { sendForm(this, null); };
 })();

@@ -59,8 +59,8 @@ const guard = fs.readFileSync(path.join(__dirname,'../app/src/main/assets/guard.
    assert.equal(m.fields.some(f=>/^q[234]?$/.test(f[0])),false);
  });
  await test('SPA側でpreventDefaultした送信を二重送信しない',async()=>{
-   calls.length=0; await page.evaluate(()=>document.querySelector('#order').addEventListener('submit', e=>e.preventDefault(),{once:true}));
-   await page.click('#submit'); await page.waitForTimeout(80); assert.equal(calls.some(m=>m.kind==='form'),false);
+   calls.length=0; await page.evaluate(()=>document.querySelector('#order').addEventListener('submit', e=>{window.spaSawDefaultPrevented=e.defaultPrevented;e.preventDefault()},{once:true}));
+   await page.click('#submit'); await page.waitForTimeout(80); assert.equal(calls.some(m=>m.kind==='form'),false);assert.equal(await page.evaluate(()=>window.spaSawDefaultPrevented),false);
  });
  await test('form.submit()もネイティブに仲介',async()=>{
    calls.length=0; await page.evaluate(()=>HTMLFormElement.prototype.submit.call(document.querySelector('#order'))); await page.waitForTimeout(80);

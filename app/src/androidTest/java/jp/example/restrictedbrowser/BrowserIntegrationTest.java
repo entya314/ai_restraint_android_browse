@@ -66,7 +66,7 @@ public class BrowserIntegrationTest {
         }
     }
     @Test public void normalEditingAndSemanticDynamicSearch() throws Exception {
-        assertEquals("true",eval("!name.disabled && !document.getElementById('note').disabled && !people.disabled && !normal.disabled"));
+        assertEquals("true",eval("!document.getElementById('name').disabled && !document.getElementById('note').disabled && !people.disabled && !normal.disabled"));
         eval("document.getElementById('name').focus(); document.execCommand('insertText',false,'Alice')");
         until("document.getElementById('name').value==='Alice'");
         until("s.disabled && r.disabled && box.disabled && tag.disabled");
@@ -105,4 +105,24 @@ public class BrowserIntegrationTest {
         until("document.body && document.body.textContent.includes('表示できません')");
         assertEquals(before,requests.size()); assertTrue(postedBodies.isEmpty());
     }
+    @Test public void getFormUsesSameOriginAndEncodedOrdinaryFields() throws Exception {
+        eval("document.getElementById('f').method='get';document.getElementById('f').action='/get-order';document.getElementById('name').value='Alice';people.value='2';document.getElementById('send').click()");
+        until("!!document.getElementById('done')");
+        assertTrue(requests.stream().anyMatch(u->u.startsWith("https://shop.example.com/get-order?") && u.contains("name=Alice") && u.contains("people=2")));
+        assertTrue(postedBodies.isEmpty());
+    }
+    @Test public void externalCdnResourceIsNotClassifiedAsNavigation() {
+        android.webkit.WebResourceRequest resource = new android.webkit.WebResourceRequest() {
+            public android.net.Uri getUrl() { return android.net.Uri.parse("https://cdn.example.net/style.css"); }
+            public boolean isForMainFrame() { return false; }
+            public boolean isRedirect() { return false; }
+            public boolean hasGesture() { return false; }
+            public String getMethod() { return "GET"; }
+            public Map<String,String> getRequestHeaders() { return Map.of(); }
+        };
+        java.util.concurrent.atomic.AtomicReference<android.webkit.WebViewClient> client = new java.util.concurrent.atomic.AtomicReference<>();
+        ui(()->client.set(session.web.getWebViewClient()));
+        assertNull(client.get().shouldInterceptRequest(session.web,resource));
+    }
+
 }
