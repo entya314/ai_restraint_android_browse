@@ -1,0 +1,20 @@
+制限ブラウザ 0.1.0-test-debug
+
+インストール対象: restricted-browser-test.apk (Android 13以上)
+restricted-browser-instrumentation.apk は開発者向け統合試験用です。通常の利用には不要です。
+
+APKをarrows We2へ転送し、ファイルアプリから開いてインストールします。
+詳しい手順は INSTALL-WINDOWS.md を参照してください。
+
+署名・ビルド検証済み。単体試験10件・ブラウザ試験10件成功。
+Androidエミュレーターでの統合試験はOS起動不安定のため実行未完了です。
+arrows We2の実機、カメラ、日本語IME、実店舗サイトは未確認です。
+この区別はTEST-REPORT.mdに記載しています。
+
+HTTPSのみ。同じhost・実効portに固定します。
+別ドメインへの注文・決済・認証は利用できません。
+検索欄の完全検出は保証できません。DESIGN.mdに対応範囲を説明しています。
+
+Windowsの開発ツールの有無を調べる場合:
+ソースのフォルダーで scripts/Check-Environment.ps1 を実行してください。
+インストールだけならAndroid Studio・JDKは不要です。

@@ -70,3 +70,15 @@ $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 - 「終了」で開始画面に戻り、セッションCookie・Webストレージ・履歴が引き継がれないこと。
 
 実際の注文は店舗の案内に従い、試験中に意図しない注文を送らないでください。送信後に転送が遮断された場合、注文だけ成立している可能性があります。再送する前に店舗へ確認してください。別ドメインでの認証・注文・決済が必要なサービスは、この仕様では利用できません。
+
+## 5. Android統合試験をWindowsで実行する場合
+
+Android StudioのDevice ManagerでGoogle APIs / API 35のエミュレーターを作成し、Windowsの仮想化・ハードウェア支援を有効にして起動を完了してください。アプリのWebViewや証明書設定を緩める必要はありません。テスト対象の端末だけを接続し、プロジェクトのフォルダーで実行します。
+
+```powershell
+.\gradlew.bat connectedDebugAndroidTest
+```
+
+7件のテストを実装しています。WebViewは実際に動かし、文書のHTTPS取得部分は試験内で模擬するため、実店舗へ注文しません。結果は `app\build\reports\androidTests\connected\debug` 以下に出力されます。このクラウド環境ではOSの起動が不安定で、これら7件の実行は完了していません。
+
+ソース一式のZIPにはGit履歴の `GIT-HISTORY.bundle` も含めます。展開してコードを利用できるほか、Gitを導入済みなら `git clone -b work GIT-HISTORY.bundle restricted-browser` で履歴付きリポジトリを復元できます。

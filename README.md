@@ -13,6 +13,8 @@ Android 13以上。Android SDK 35 / Build-Tools 35.0.0 / JDK 17または21。And
 .\gradlew.bat testDebugUnitTest lintDebug assembleDebug
 ```
 
+一式ZIP: `dist/restricted-browser-complete.zip`（ソース・APK・手順・試験記録・Git履歴）。
+
 保存済みAPK: `dist/restricted-browser-test.apk`。ビルド出力: `app/build/outputs/apk/debug/app-debug.apk`（debug鍵で署名）。アプリID: `jp.example.restrictedbrowser.test`。
 
 JavaScriptのブラウザ試験:

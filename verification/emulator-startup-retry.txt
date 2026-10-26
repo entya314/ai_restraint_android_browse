@@ -1,0 +1,73 @@
+--------- beginning of system
+10-26 05:20:34.906   602   640 I SystemServer: WebViewFactoryPreparation
+10-26 05:21:35.472   602   648 I Watchdog: Interesting Java process com.android.phone started. Pid 1130
+10-26 05:21:41.924   602   602 I Watchdog: Watchdog timeout updated to 60000 millis
+10-26 05:21:45.825   602   639 W Watchdog: *** WATCHDOG KILLING SYSTEM PROCESS: Blocked in handler on main thread (main) for 65s
+10-26 05:21:46.010   602   639 W Watchdog: main annotated stack trace:
+10-26 05:21:46.011   602   639 W Watchdog:     at java.lang.StringBuilder.append(StringBuilder.java:257)
+10-26 05:21:46.012   602   639 W Watchdog:     at android.icu.impl.LocaleIDParser.append(LocaleIDParser.java:83)
+10-26 05:21:46.012   602   639 W Watchdog:     at android.icu.impl.LocaleIDParser.parseLanguage(LocaleIDParser.java:208)
+10-26 05:21:46.017   602   639 W Watchdog:     at android.icu.impl.LocaleIDParser.parseBaseName(LocaleIDParser.java:518)
+10-26 05:21:46.021   602   639 W Watchdog:     at android.icu.impl.LocaleIDParser.getName(LocaleIDParser.java:548)
+10-26 05:21:46.021   602   639 W Watchdog:     at android.icu.util.ULocale$1.createInstance(ULocale.java:112)
+10-26 05:21:46.022   602   639 W Watchdog:     at android.icu.util.ULocale$1.createInstance(ULocale.java:109)
+10-26 05:21:46.022   602   639 W Watchdog:     at android.icu.impl.SoftCache.getInstance(SoftCache.java:71)
+10-26 05:21:46.022   602   639 W Watchdog:     at android.icu.util.ULocale.getName(ULocale.java:1100)
+10-26 05:21:46.022   602   639 W Watchdog:     at android.icu.util.ULocale.<init>(ULocale.java:403)
+10-26 05:21:46.023   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle$WholeBundle.<init>(ICUResourceBundle.java:66)
+10-26 05:21:46.023   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle.getBundle(ICUResourceBundle.java:1612)
+10-26 05:21:46.023   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle.createBundle(ICUResourceBundle.java:1557)
+10-26 05:21:46.024   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle$5.load(ICUResourceBundle.java:1423)
+10-26 05:21:46.024   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle$1.createInstance(ICUResourceBundle.java:98)
+10-26 05:21:46.031   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle$1.createInstance(ICUResourceBundle.java:95)
+10-26 05:21:46.032   602   639 W Watchdog:     at android.icu.impl.SoftCache.getInstance(SoftCache.java:71)
+10-26 05:21:46.032   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle.instantiateBundle(ICUResourceBundle.java:1410)
+10-26 05:21:46.037   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle.getBundleInstance(ICUResourceBundle.java:1292)
+10-26 05:21:46.037   602   639 W Watchdog:     at android.icu.impl.ICUResourceBundle.getBundleInstance(ICUResourceBundle.java:1271)
+10-26 05:21:46.037   602   639 W Watchdog:     at android.icu.util.UResourceBundle.instantiateBundle(UResourceBundle.java:361)
+10-26 05:21:46.038   602   639 W Watchdog:     at android.icu.util.UResourceBundle.getBundleInstance(UResourceBundle.java:147)
+10-26 05:21:46.038   602   639 W Watchdog:     at android.icu.util.UResourceBundle.getBundleInstance(UResourceBundle.java:110)
+10-26 05:21:46.038   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesImpl$TZ2MZsCache.createInstance(TimeZoneNamesImpl.java:861)
+10-26 05:21:46.039   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesImpl$TZ2MZsCache.createInstance(TimeZoneNamesImpl.java:853)
+10-26 05:21:46.039   602   639 W Watchdog:     at android.icu.impl.SoftCache.getInstance(SoftCache.java:71)
+10-26 05:21:46.039   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesImpl._getAvailableMetaZoneIDs(TimeZoneNamesImpl.java:104)
+10-26 05:21:46.039   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesImpl.getAvailableMetaZoneIDs(TimeZoneNamesImpl.java:97)
+10-26 05:21:46.040   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesImpl.loadStrings(TimeZoneNamesImpl.java:453)
+10-26 05:21:46.046   602   639 W Watchdog:     - locked <0x0293a096> (a android.icu.impl.TimeZoneNamesImpl)
+10-26 05:21:46.046   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesImpl.initialize(TimeZoneNamesImpl.java:437)
+10-26 05:21:46.047   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesImpl.<init>(TimeZoneNamesImpl.java:67)
+10-26 05:21:46.048   602   639 W Watchdog:     at android.icu.impl.TimeZoneNamesFactoryImpl.getTimeZoneNames(TimeZoneNamesFactoryImpl.java:27)
+10-26 05:21:46.048   602   639 W Watchdog:     at android.icu.text.TimeZoneNames$Cache.createInstance(TimeZoneNames.java:496)
+10-26 05:21:46.053   602   639 W Watchdog:     at android.icu.text.TimeZoneNames$Cache.createInstance(TimeZoneNames.java:487)
+10-26 05:21:46.053   602   639 W Watchdog:     at android.icu.impl.SoftCache.getInstance(SoftCache.java:71)
+10-26 05:21:46.054   602   639 W Watchdog:     at android.icu.text.TimeZoneNames.getInstance(TimeZoneNames.java:157)
+10-26 05:21:46.054   602   639 W Watchdog:     at android.icu.text.TimeZoneNames.getInstance(TimeZoneNames.java:169)
+10-26 05:21:46.054   602   639 W Watchdog:     at java.util.TimeZone.getDisplayName(TimeZone.java:410)
+10-26 05:21:46.054   602   639 W Watchdog:     at java.util.Date.toString(Date.java:1068)
+10-26 05:21:46.055   602   639 W Watchdog:     at java.lang.String.valueOf(String.java:4102)
+10-26 05:21:46.055   602   639 W Watchdog:     at java.lang.StringBuilder.append(StringBuilder.java:179)
+10-26 05:21:46.055   602   639 W Watchdog:     at com.android.server.notification.SystemConditionProviderService.ts(SystemConditionProviderService.java:41)
+10-26 05:21:46.056   602   639 W Watchdog:     at com.android.server.notification.ScheduleConditionProvider.evaluateSubscriptionLocked(ScheduleConditionProvider.java:190)
+10-26 05:21:46.056   602   639 W Watchdog:     at com.android.server.notification.ScheduleConditionProvider.evaluateSubscriptions(ScheduleConditionProvider.java:174)
+10-26 05:21:46.060   602   639 W Watchdog:     - locked <0x0dcd4417> (a android.util.ArrayMap)
+10-26 05:21:46.063   602   639 W Watchdog:     at com.android.server.notification.ScheduleConditionProvider.onSubscribe(ScheduleConditionProvider.java:139)
+10-26 05:21:46.063   602   639 W Watchdog:     at android.service.notification.ConditionProviderService$H.handleMessage(ConditionProviderService.java:280)
+10-26 05:21:46.064   602   639 W Watchdog:     at android.os.Handler.dispatchMessage(Handler.java:107)
+10-26 05:21:46.064   602   639 W Watchdog:     at android.os.Looper.loopOnce(Looper.java:232)
+10-26 05:21:46.064   602   639 W Watchdog:     at android.os.Looper.loop(Looper.java:317)
+10-26 05:21:46.068   602   639 W Watchdog:     at com.android.server.SystemServer.run(SystemServer.java:973)
+10-26 05:21:46.069   602   639 W Watchdog:     at com.android.server.SystemServer.main(SystemServer.java:657)
+10-26 05:21:46.069   602   639 W Watchdog:     at java.lang.reflect.Method.invoke(Native Method)
+10-26 05:21:46.070   602   639 W Watchdog:     at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+10-26 05:21:46.070   602   639 W Watchdog:     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:864)
+10-26 05:21:46.071   602   639 W Watchdog: *** GOODBYE!
+10-26 05:22:26.565  1286  1286 I SystemServer: Entered the Android system server!
+10-26 05:22:28.056  1286  1286 I SystemServer: Reading configuration...
+10-26 05:22:35.134  1286  1286 I Watchdog: Pausing HandlerChecker: main thread for reason: packagemanagermain. Pause count: 1
+10-26 05:23:08.427  1286  1286 I Watchdog: Resuming HandlerChecker: main thread for reason: packagemanagermain. Pause count: 0
+10-26 05:23:08.627  1286  1286 I Watchdog: Pausing HandlerChecker: main thread for reason: moveab. Pause count: 1
+10-26 05:23:08.673  1286  1286 I Watchdog: Resuming HandlerChecker: main thread for reason: moveab. Pause count: 0
+10-26 05:23:14.039  1286  1400 I SystemServer: SecondaryZygotePreload
+10-26 05:23:21.036  1286  1286 I Watchdog: Pausing HandlerChecker: main thread for reason: dexopt. Pause count: 1
+10-26 05:23:21.060  1286  1286 I Watchdog: Resuming HandlerChecker: main thread for reason: dexopt. Pause count: 0
+10-26 05:23:43.107  1286  1314 I Watchdog: WAITED_UNTIL_PRE_WATCHDOG

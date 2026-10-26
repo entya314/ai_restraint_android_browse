@@ -1,0 +1,65 @@
+--------- beginning of system
+10-26 05:07:10.317   592   629 I SystemServer: SecondaryZygotePreload
+10-26 05:08:30.743   592   592 I Watchdog: Pausing HandlerChecker: main thread for reason: dexopt. Pause count: 1
+10-26 05:08:43.930   592   628 W Watchdog: *** WATCHDOG KILLING SYSTEM PROCESS: Blocked in handler on main thread (main) for 67s
+10-26 05:08:45.653   592   628 W Watchdog: main annotated stack trace:
+10-26 05:08:45.682   592   628 W Watchdog:     at jdk.internal.misc.Unsafe.park(Native Method)
+10-26 05:08:45.683   592   628 W Watchdog:     at java.util.concurrent.locks.LockSupport.park(LockSupport.java:211)
+10-26 05:08:45.683   592   628 W Watchdog:     at java.util.concurrent.CompletableFuture$Signaller.block(CompletableFuture.java:1840)
+10-26 05:08:45.684   592   628 W Watchdog:     at java.util.concurrent.ForkJoinPool.unmanagedBlock(ForkJoinPool.java:3466)
+10-26 05:08:45.684   592   628 W Watchdog:     at java.util.concurrent.ForkJoinPool.managedBlock(ForkJoinPool.java:3437)
+10-26 05:08:45.684   592   628 W Watchdog:     at java.util.concurrent.CompletableFuture.waitingGet(CompletableFuture.java:1874)
+10-26 05:08:45.685   592   628 W Watchdog:     at java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2048)
+10-26 05:08:45.685   592   628 W Watchdog:     at com.android.server.art.Utils.getFuture(Utils.java:280)
+10-26 05:08:45.698   592   628 W Watchdog:     at com.android.server.art.DexoptHelper$$ExternalSyntheticLambda6.apply(R8$$SyntheticClass:0)
+10-26 05:08:45.699   592   628 W Watchdog:     at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:209)
+10-26 05:08:45.699   592   628 W Watchdog:     at java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1725)
+10-26 05:08:45.699   592   628 W Watchdog:     at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:513)
+10-26 05:08:45.700   592   628 W Watchdog:     at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:503)
+10-26 05:08:45.700   592   628 W Watchdog:     at java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)
+10-26 05:08:45.700   592   628 W Watchdog:     at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:236)
+10-26 05:08:45.700   592   628 W Watchdog:     at java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:706)
+10-26 05:08:45.701   592   628 W Watchdog:     at com.android.server.art.DexoptHelper.dexoptPackages(DexoptHelper.java:179)
+10-26 05:08:45.701   592   628 W Watchdog:     at com.android.server.art.DexoptHelper.dexopt(DexoptHelper.java:105)
+10-26 05:08:45.701   592   628 W Watchdog:     at com.android.server.art.ArtManagerLocal.dexoptPackages(ArtManagerLocal.java:505)
+10-26 05:08:45.746   592   628 W Watchdog:     at com.android.server.art.ArtManagerLocal.onBoot(ArtManagerLocal.java:899)
+10-26 05:08:45.747   592   628 W Watchdog:     at com.android.server.pm.DexOptHelper.performPackageDexOptUpgradeIfNeeded(DexOptHelper.java:150)
+10-26 05:08:45.747   592   628 W Watchdog:     at com.android.server.pm.PackageManagerService.updatePackagesIfNeeded(PackageManagerService.java:3010)
+10-26 05:08:45.748   592   628 W Watchdog:     at com.android.server.SystemServer.startOtherServices(SystemServer.java:1837)
+10-26 05:08:45.748   592   628 W Watchdog:     at com.android.server.SystemServer.run(SystemServer.java:936)
+10-26 05:08:45.748   592   628 W Watchdog:     at com.android.server.SystemServer.main(SystemServer.java:657)
+10-26 05:08:45.748   592   628 W Watchdog:     at java.lang.reflect.Method.invoke(Native Method)
+10-26 05:08:45.749   592   628 W Watchdog:     at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+10-26 05:08:45.749   592   628 W Watchdog:     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:864)
+10-26 05:08:45.749   592   628 W Watchdog: *** GOODBYE!
+10-26 05:09:44.203  1224  1224 I SystemServer: Entered the Android system server!
+10-26 05:09:45.498  1224  1224 I SystemServer: Reading configuration...
+10-26 05:09:52.435  1224  1224 I Watchdog: Pausing HandlerChecker: main thread for reason: packagemanagermain. Pause count: 1
+10-26 05:10:20.803  1224  1224 I Watchdog: Resuming HandlerChecker: main thread for reason: packagemanagermain. Pause count: 0
+10-26 05:10:20.908  1224  1224 I Watchdog: Pausing HandlerChecker: main thread for reason: moveab. Pause count: 1
+10-26 05:10:20.917  1224  1224 I Watchdog: Resuming HandlerChecker: main thread for reason: moveab. Pause count: 0
+10-26 05:10:28.144  1224  1320 I SystemServer: SecondaryZygotePreload
+10-26 05:10:35.508  1224  1224 I Watchdog: Pausing HandlerChecker: main thread for reason: dexopt. Pause count: 1
+10-26 05:10:42.412  1224  1224 I Watchdog: Resuming HandlerChecker: main thread for reason: dexopt. Pause count: 0
+10-26 05:11:00.559  1224  1253 I Watchdog: WAITED_UNTIL_PRE_WATCHDOG
+10-26 05:11:30.064  1224  1224 I SystemServer: Making services ready
+10-26 05:11:37.740  1224  1254 I SystemServer: WebViewFactoryPreparation
+10-26 05:13:22.532  1224  1253 W Watchdog: *** WATCHDOG KILLING SYSTEM PROCESS: Blocked in handler on main thread (main) for 73s
+10-26 05:13:24.926  1224  1253 W Watchdog: main annotated stack trace:
+10-26 05:13:24.930  1224  1253 W Watchdog:     at com.android.server.StorageManagerService.updateLegacyStorageApps(StorageManagerService.java:2129)
+10-26 05:13:24.931  1224  1253 W Watchdog:     at com.android.server.StorageManagerService.snapshotAndMonitorLegacyStorageAppOp(StorageManagerService.java:2154)
+10-26 05:13:24.932  1224  1253 W Watchdog:     at com.android.server.StorageManagerService.-$$Nest$msnapshotAndMonitorLegacyStorageAppOp(StorageManagerService.java:0)
+10-26 05:13:24.932  1224  1253 W Watchdog:     at com.android.server.StorageManagerService$Lifecycle.onUserStarting(StorageManagerService.java:292)
+10-26 05:13:24.932  1224  1253 W Watchdog:     at com.android.server.SystemServiceManager.onUser(SystemServiceManager.java:565)
+10-26 05:13:24.932  1224  1253 W Watchdog:     at com.android.server.SystemServiceManager.onUser(SystemServiceManager.java:512)
+10-26 05:13:24.933  1224  1253 W Watchdog:     at com.android.server.SystemServiceManager.onUserStarting(SystemServiceManager.java:409)
+10-26 05:13:24.933  1224  1253 W Watchdog:     at com.android.server.am.UserController$Injector.onUserStarting(UserController.java:4055)
+10-26 05:13:24.933  1224  1253 W Watchdog:     at com.android.server.am.UserController.onSystemUserStarting(UserController.java:2945)
+10-26 05:13:24.946  1224  1253 W Watchdog:     at com.android.server.am.ActivityManagerService.systemReady(ActivityManagerService.java:9154)
+10-26 05:13:24.950  1224  1253 W Watchdog:     at com.android.server.SystemServer.startOtherServices(SystemServer.java:3028)
+10-26 05:13:24.954  1224  1253 W Watchdog:     at com.android.server.SystemServer.run(SystemServer.java:936)
+10-26 05:13:24.955  1224  1253 W Watchdog:     at com.android.server.SystemServer.main(SystemServer.java:657)
+10-26 05:13:24.955  1224  1253 W Watchdog:     at java.lang.reflect.Method.invoke(Native Method)
+10-26 05:13:24.955  1224  1253 W Watchdog:     at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+10-26 05:13:24.955  1224  1253 W Watchdog:     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:864)
+10-26 05:13:24.956  1224  1253 W Watchdog: *** GOODBYE!

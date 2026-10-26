@@ -1,4 +1,4 @@
-param([string]$Apk = '.\restricted-browser-test.apk', [string]$Serial = '')
+param([string]$Apk = "$PSScriptRoot\..\dist\restricted-browser-test.apk", [string]$Serial = '')
 $ErrorActionPreference = 'Stop'
 if (!(Test-Path $Apk)) { throw "APK not found: $Apk" }
 $sdk = $env:ANDROID_HOME
