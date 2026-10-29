@@ -16,14 +16,56 @@ public final class MainActivity extends Activity {
     private BrowserSession session;
     private LinearLayout screen;
     private boolean resetting;
+    private boolean destroyed;
+    private boolean scanning;
+    private AlertDialog externalLinkDialog;
+    private AlertDialog urlDialog;
+    private ExternalLinkCoordinator externalLinks;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        externalLinks = new ExternalLinkCoordinator(new ExternalLinkCoordinator.Host() {
+            public boolean hasSession() { return session != null; }
+            public boolean isResetting() { return resetting; }
+            public void dismissConfirmation() {
+                if (externalLinkDialog != null) { externalLinkDialog.dismiss(); externalLinkDialog = null; }
+            }
+            public void prepareForExternalLink() {
+                scanning = false; // Ignore any late QR result after an independent external launch.
+                if (urlDialog != null) { urlDialog.dismiss(); urlDialog = null; }
+            }
+            public void confirmReplacement(String domain, long id) {
+                externalLinkDialog = new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("外部リンクを開きますか？")
+                    .setMessage("現在の閲覧を終了して、" + domain + " を開きます。入力中の内容やログイン状態は引き継がれません。送信済みの注文は取り消されません。")
+                    .setPositiveButton("終了して開く", (d, which) -> externalLinks.confirm(id))
+                    .setNegativeButton("キャンセル", (d, which) -> externalLinks.cancel(id))
+                    .setOnCancelListener(d -> externalLinks.cancel(id)).create();
+                externalLinkDialog.show();
+            }
+            public void resetSession() { MainActivity.this.resetSession(false); }
+            public void open(String url) { MainActivity.this.open(url); }
+            public void reject(String message) { Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show(); }
+        });
         getWindow().getDecorView().setOnApplyWindowInsetsListener((v, insets) -> {
             v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
                 insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom()); return insets.consumeSystemWindowInsets();
         });
         // Never restore WebView history or a previous ordering session after process recreation.
         resetSession();
+        // Process recreation starts at home, rather than replaying an old login/payment URL.
+        if (state == null) receiveExternalIntent(getIntent());
+        else setIntent(new Intent(this, MainActivity.class).setAction(Intent.ACTION_MAIN));
+    }
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        receiveExternalIntent(intent);
+    }
+    private void receiveExternalIntent(Intent intent) {
+        if (intent == null || !Intent.ACTION_VIEW.equals(intent.getAction())) return;
+        String url = intent.getDataString();
+        // Ignore all extras, including headers, fallback URLs and Custom Tabs session requests.
+        setIntent(new Intent(this, MainActivity.class).setAction(Intent.ACTION_MAIN));
+        externalLinks.receive(url);
     }
     private int dp(int n) { return Math.round(n * getResources().getDisplayMetrics().density); }
     private Button button(String text) {
@@ -39,6 +81,7 @@ public final class MainActivity extends Activity {
         screen.addView(url, second); setContentView(screen);
         qr.setOnClickListener(v -> {
             if (!ready()) return;
+            scanning = true;
             new IntentIntegrator(this).setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
                 .setPrompt("利用するサイトのQRコードを読み取ってください")
                 .setBeepEnabled(false).setBarcodeImageEnabled(false).setOrientationLocked(false).initiateScan();
@@ -63,6 +106,8 @@ public final class MainActivity extends Activity {
         layout.addView(input, new LinearLayout.LayoutParams(-1, -2));
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle("URL入力").setView(layout)
             .setPositiveButton("開く", null).setNegativeButton("キャンセル", null).create();
+        urlDialog = dialog;
+        dialog.setOnDismissListener(d -> { if (urlDialog == dialog) urlDialog = null; });
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             try {
                 String url = UrlPolicy.fromInput(input.getText().toString());
@@ -74,7 +119,7 @@ public final class MainActivity extends Activity {
     private void open(String url) {
         if (!ready()) return;
         try {
-            // Parsing is shared by QR and typed entry. QR data is never interpreted as an Intent.
+            // All entry paths are validated; no external Intent is ever passed to WebView directly.
             UrlPolicy.parse(url);
             ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(screen.getWindowToken(), 0);
             session = new BrowserSession(this, url);
@@ -96,14 +141,24 @@ public final class MainActivity extends Activity {
         }
     }
     private void resetSession() {
+        resetSession(true);
+    }
+    private void resetSession(boolean clearExternal) {
+        if (clearExternal) externalLinks.clear();
         if (session != null) { session.close(); session = null; }
         resetting = true; home();
-        CookieManager.getInstance().removeAllCookies(done -> { resetting = false; });
         android.webkit.WebStorage.getInstance().deleteAllData();
+        CookieManager.getInstance().removeAllCookies(done -> {
+            if (destroyed) return;
+            resetting = false;
+            externalLinks.onResetComplete();
+        });
     }
     @Override protected void onActivityResult(int request, int result, Intent data) {
         IntentResult scan = IntentIntegrator.parseActivityResult(request, result, data);
         if (scan != null) {
+            if (!scanning) return;
+            scanning = false;
             if (scan.getContents() != null) {
                 try { open(UrlPolicy.fromInput(scan.getContents())); }
                 catch (IllegalArgumentException e) { Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show(); }
@@ -120,6 +175,9 @@ public final class MainActivity extends Activity {
     @Override protected void onPause() { if (session != null) session.web.onPause(); super.onPause(); }
     @Override protected void onResume() { super.onResume(); if (session != null) session.web.onResume(); }
     @Override protected void onDestroy() {
+        destroyed = true;
+        externalLinks.close();
+        if (urlDialog != null) { urlDialog.dismiss(); urlDialog = null; }
         if (session != null) { session.close(); session = null; }
         super.onDestroy();
     }

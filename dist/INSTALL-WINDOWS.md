@@ -79,6 +79,26 @@ Android StudioのDevice ManagerでGoogle APIs / API 35のエミュレーター�
 .\gradlew.bat connectedDebugAndroidTest
 ```
 
-7件のテストを実装しています。WebViewは実際に動かし、文書のHTTPS取得部分は試験内で模擬するため、実店舗へ注文しません。結果は `app\build\reports\androidTests\connected\debug` 以下に出力されます。このクラウド環境ではOSの起動が不安定で、これら7件の実行は完了していません。
+11件のAndroid統合試験を実装しています（WebViewの試験7件＋Intent解決の試験4件）。WebViewは実際に動かし、文書のHTTPS取得部分は試験内で模擬するため、実店舗へ注文しません。結果は `app\build\reports\androidTests\connected\debug` 以下に出力されます。このクラウド環境ではOSの起動が不安定で、これらのAndroid統合試験の実行は完了していません。
 
 ソース一式のZIPにはGit履歴の `GIT-HISTORY.bundle` も含めます。展開してコードを利用できるほか、Gitを導入済みなら `git clone -b work GIT-HISTORY.bundle restricted-browser` で履歴付きリポジトリを復元できます。
+
+## 6. 他のアプリのリンクを開く／標準ブラウザに設定する（0.2.0）
+
+1. 更新版 `restricted-browser-test.apk` をインストールします。今回の配布APKは初回配布版と同じdebug証明書で署名しました。ご自身のPCで再ビルドした版は別の鍵の場合があり、上書きできない場合の対処は前述のとおりです。
+2. arrows We2で「設定 → アプリ → デフォルトのアプリ → ブラウザアプリ」を開き、「制限ブラウザ」を選択します。メニュー名はOS版で異なります。アプリから標準設定を自動変更する処理はありません。
+3. 別のアプリでHTTPSリンクを押して確認します。ブラウザ選択が出た場合は「制限ブラウザ」を選びます。初回・開始画面ではそのリンクを新しい利用の起点として開きます。
+4. 閲覧中に別アプリからリンクを受け取ると確認画面が出ます。「キャンセル」や戻る操作では現在の閲覧を維持し、「終了して開く」で現在のセッションを消去して新しいリンクを開きます。同じドメインのリンクでも確認します。送信済みの注文は取り消されません。
+5. HTTP、検索エンジン、不正なURLは拒否します。現在の閲覧をこれらのリンクで終了することはありません。
+
+HTTP/HTTPSを受け付ける宣言は、Androidのブラウザ候補として検出されるために行います。HTTPのページを表示する機能は追加していません。OSによるアプリリンクの振り分けにより、対応アプリが別にあるURLはそちらへ開く場合もあります。
+
+Custom Tabsの専用サービスを必須とするアプリや、特定のブラウザ名を指定するアプリとの互換性は別途必要です。今回の対応は通常の `ACTION_VIEW` によるURL起動です。「共有」操作の `ACTION_SEND` や検索語による起動は対象外です。
+
+ADBから通常の外部リンク起動を手動確認する場合（実機未実施）:
+
+```powershell
+& $adb shell am start -W -a android.intent.action.VIEW -c android.intent.category.BROWSABLE -d 'https://example.com/' -p jp.example.restrictedbrowser.test
+```
+
+一度開始画面から開き、続いて同じコマンドをもう一度実行し、切り替え確認・キャンセル・了承をそれぞれ試してください。さらにHTTPや `https://www.google.com/` では拒否されることを確認してください。実際の店舗への注文URLを試験に使う必要はありません。

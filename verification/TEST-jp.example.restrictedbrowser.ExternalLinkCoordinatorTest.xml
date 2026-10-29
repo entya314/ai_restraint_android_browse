@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-10-29T01:23:04" hostname="a948be1fb6ab" time="0.044">
+  <properties/>
+  <testcase name="staleDialogCannotApproveDifferentIncomingLink" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.028"/>
+  <testcase name="sameDomainExternalLinkStillRequiresConfirmation" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="consentClosesOldSessionThenWaitsForCookies" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.0"/>
+  <testcase name="idleReadyLaunchOpensImmediately" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.0"/>
+  <testcase name="synchronousCleanupDoesNotOpenTwice" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="destructionDiscardsQueuedLinkAndLateCallbacks" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.0"/>
+  <testcase name="coldLaunchWaitsForStartupCookieCleanup" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="lateCancellationAfterApprovalCannotCancelAnAcceptedLink" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="cancellationKeepsExistingSession" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="activeSessionOnlyPromptsBeforeConsent" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.0"/>
+  <testcase name="invalidAndSearchEngineLinksDoNotDestroyCurrentSession" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.002"/>
+  <testcase name="manualHomeRequestDiscardsPendingLink" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="invalidLinkDoesNotReplaceValidPendingLink" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.0"/>
+  <testcase name="destructionInvalidatesConfirmation" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.0"/>
+  <testcase name="queryAndFragmentSurviveWithoutBeingShownInConfirmation" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="latestValidLinkDuringStartupWins" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <testcase name="latestLinkDuringApprovedCleanupWinsWithoutParallelSession" classname="jp.example.restrictedbrowser.ExternalLinkCoordinatorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

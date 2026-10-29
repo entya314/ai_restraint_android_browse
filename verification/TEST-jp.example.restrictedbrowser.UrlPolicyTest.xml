@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="jp.example.restrictedbrowser.UrlPolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:07:30" hostname="3f46a9f4c563" time="0.015">
+<testsuite name="jp.example.restrictedbrowser.UrlPolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-29T01:23:04" hostname="a948be1fb6ab" time="0.007">
   <properties/>
-  <testcase name="strictEntryAndNoSearchFallback" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.006"/>
-  <testcase name="sameHostAndEffectivePortOnly" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.001"/>
-  <testcase name="searchDomainsAtEntryFromEitherSource" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.005"/>
-  <testcase name="everyRedirectUsesSamePolicy" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.003"/>
+  <testcase name="strictEntryAndNoSearchFallback" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.002"/>
+  <testcase name="sameHostAndEffectivePortOnly" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.002"/>
+  <testcase name="searchDomainsAtEntryFromEitherSource" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.002"/>
+  <testcase name="everyRedirectUsesSamePolicy" classname="jp.example.restrictedbrowser.UrlPolicyTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
