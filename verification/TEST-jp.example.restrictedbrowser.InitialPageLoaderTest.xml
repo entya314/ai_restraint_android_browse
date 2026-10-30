@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="jp.example.restrictedbrowser.InitialPageLoaderTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2026-10-30T05:27:57" hostname="85263159b9e0" time="0.084">
+  <properties/>
+  <testcase name="tlsFailurePropagatesWithoutFallbackOrCertificateOverrides" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.004"/>
+  <testcase name="finalCustomPortBecomesThePinnedPort" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.005"/>
+  <testcase name="preparedOriginIsPinnedForAllLaterGetAndPostRequests" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.003"/>
+  <testcase name="initialPreparationCannotBeRepeatedAfterSuccess" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.004"/>
+  <testcase name="invalidEntryNeverConnects" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.001"/>
+  <testcase name="allInitialRedirectCodesCanCrossHostsAsGet" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.007"/>
+  <testcase name="cancellationDuringResponseStopsCookiesAndTheNextHop" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.001"/>
+  <testcase name="multiHopAndRelativeLocationUseTheCurrentUrl" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.003"/>
+  <testcase name="directPageStillOpensOnce" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.001"/>
+  <testcase name="cookieAndSensitiveRequestHeadersAreNotCopiedAcrossHosts" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.002"/>
+  <testcase name="searchEngineCannotBeUsedAsAnIntermediateHop" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.003"/>
+  <testcase name="unsupportedThreeHundredResponsesAreNotRenderedAsFinalHtml" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.001"/>
+  <testcase name="cancellationBeforeLoadMakesNoRequest" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.002"/>
+  <testcase name="missingLocationDoesNotExposeAnIntermediatePage" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.002"/>
+  <testcase name="crossHostLoopHasAFiniteUpperLimit" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.033"/>
+  <testcase name="firstHtmlCspUsesTheFinalOriginAndPreservesAuthorPolicy" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.001"/>
+  <testcase name="failureDoesNotReopenTheInitialAllowance" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.0"/>
+  <testcase name="cancellationDuringABodyReadStopsBeforeReturningAPage" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.001"/>
+  <testcase name="everyDestinationIsValidatedBeforeConnecting" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.004"/>
+  <testcase name="exactRedirectLimitCanStillReturnAPage" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.002"/>
+  <testcase name="nonHtmlFinalResponseIsNotPrepared" classname="jp.example.restrictedbrowser.InitialPageLoaderTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

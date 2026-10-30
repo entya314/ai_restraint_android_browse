@@ -71,9 +71,15 @@ public final class UrlPolicy {
         } catch (IllegalArgumentException e) { return false; }
     }
     public String resolveRedirect(String from, String location) {
+        String resolved = resolveHttpsRedirect(from, location);
+        if (!allows(resolved)) throw new IllegalArgumentException("別ドメインへの転送を禁止しました。");
+        return resolved;
+    }
+    /** Only the initial native GET chain may cross origins, after validating every destination. */
+    static String resolveHttpsRedirect(String from, String location) {
         if (location == null || location.isEmpty()) throw new IllegalArgumentException("転送先がありません。");
         String resolved = URI.create(from).resolve(location).toASCIIString();
-        if (!allows(resolved)) throw new IllegalArgumentException("別ドメインへの転送を禁止しました。");
+        parse(resolved);
         return resolved;
     }
     public static boolean isSearch(String host) {

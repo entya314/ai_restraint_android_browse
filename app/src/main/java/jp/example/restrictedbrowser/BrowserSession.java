@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /** One origin and one WebView. Only this instance can consume its pending document response. */
 public final class BrowserSession {
@@ -23,7 +24,10 @@ public final class BrowserSession {
     private volatile boolean closed;
     private volatile boolean posting;
     private volatile NavigationGateway.Page pending;
+    private final AtomicReference<NavigationGateway.Page> initialPage = new AtomicReference<>();
     private long lastNotice;
+    private boolean started;
+    private final Object cookieLifecycle = new Object();
 
     public static boolean supported() {
         return WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
@@ -66,8 +70,15 @@ public final class BrowserSession {
             });
         } else throw new IOException("Service Worker制御が利用できません。");
         gateway = new NavigationGateway(policy, new NavigationGateway.Cookies() {
-            public String get(String url) { if (closed) throw new IllegalStateException("セッションは終了しました。"); return cm.getCookie(url); }
-            public void put(String url, String value) { if (!closed) cm.setCookie(url, value); }
+            public String get(String url) {
+                synchronized (cookieLifecycle) {
+                    if (closed) throw new IllegalStateException("セッションは終了しました。");
+                    return cm.getCookie(url);
+                }
+            }
+            public void put(String url, String value) {
+                synchronized (cookieLifecycle) { if (!closed) cm.setCookie(url, value); }
+            }
         }, s.getUserAgentString(), connector);
         web.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onCreateWindow(WebView v, boolean dialog, boolean gesture, Message msg) { notice("新しいウィンドウは禁止されています。"); return false; }
@@ -97,6 +108,10 @@ public final class BrowserSession {
                     notice("この移動・送信は禁止されています。"); return denied();
                 }
                 try {
+                    // Chrome may normalize the URL path. The first allowed main GET gets the already
+                    // fetched document once, after the immutable final-origin/method checks above.
+                    NavigationGateway.Page prepared = initialPage.getAndSet(null);
+                    if (prepared != null) return response(prepared);
                     NavigationGateway.Page page = pending;
                     if (page != null && documentKey(page.url).equals(documentKey(url))) { pending = null; return response(page); }
                     page = gateway.fetch(url, "GET", null, null, r.getRequestHeaders().get("Referer"));
@@ -139,7 +154,17 @@ public final class BrowserSession {
         } else throw new IOException("文書開始時の制御が利用できません。");
     }
     public String domain() { return policy.host; }
-    public void open(String url) { if (!closed && policy.allows(url)) web.loadUrl(url); }
+    public void open(String url) {
+        if (!closed && policy.allows(url)) { started = true; web.loadUrl(url); }
+    }
+    /** policy, CSP, bridge and start script already use the final origin before exposing any HTML. */
+    void showInitialPage(NavigationGateway.Page page) {
+        if (closed) return;
+        if (started || !policy.allows(page.url)) throw new IllegalStateException("初回ページの表示先を確認できません。");
+        started = true;
+        initialPage.set(page);
+        web.loadUrl(page.url); // Serve once even if WebView canonicalizes the path; never repeat the initial GET.
+    }
     private void onMessage(String data) throws Exception {
         if (data == null || data.length() > 1024 * 1024) throw new IOException("送信内容が大きすぎます。");
         JSONObject m = new JSONObject(data);
@@ -216,8 +241,11 @@ public final class BrowserSession {
         });
     }
     public void close() {
-        if (closed) return;
-        closed = true; pending = null; posts.shutdownNow();
+        synchronized (cookieLifecycle) {
+            if (closed) return;
+            closed = true;
+        }
+        initialPage.set(null); pending = null; posts.shutdownNow();
         web.stopLoading(); web.clearHistory(); web.clearCache(true); web.destroy();
         WebStorage.getInstance().deleteAllData();
     }

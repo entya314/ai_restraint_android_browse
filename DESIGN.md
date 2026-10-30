@@ -8,11 +8,11 @@ HTTPSのみを受け付けます。hostは大文字小文字を正規化して�
 
 Google（地域ドメイン群を含む）、Bing、Yahoo、DuckDuckGo、Baidu、Yandex、Brave、Ecosia等をhostのラベル境界で拒否します。`evilgoogle.example`等を部分一致で誤検出しません。リストはUrlPolicy.javaで管理し、設定画面は設けません。世界中の未知の検索サイト、サイト内プロキシ、独自の検索APIを完全に分類するものではありません。
 
-初回のhost・HTTPS・実効portを固定し、転送先を新しい起点として採用しません。`short.example`から`order.example`へ転送する短縮QRも拒否します。画面上は仕様どおりドメイン名のみを表示します。
+0.3.0では、最初のHTMLを取得するまでのHTTP転送は各段階を検証して許可し、最終URLのhost・HTTPS・実効portを固定します。`short.example`から`order.example`へのHTTPS転送も、検索サイト等の拒否条件に該当しなければ初回だけ許可します。WebViewへのHTML引き渡し前に固定し、その後は転送先を新しい起点として採用しません。画面上は仕様どおりドメイン名のみを表示します。
 
 「終了」やActivity再生成でセッションを閉じ、Cookie・Webストレージ・WebViewキャッシュ・履歴を消去します。回転ではActivityを再生成しません。注文は終了前に店舗へ送信済みの可能性があり、終了操作でサーバー側の注文は取り消せません。WebViewの内部ファイルの完全消去や端末のフォレンジック対策を保証する機能ではありません。
 
-## ナビゲーションとPOST
+## ナビゲーションとPOST（表示先固定後）
 
 1. `shouldOverrideUrlLoading`でリンク、JavaScriptによる遷移、フォーム等の非許可URLを拒否します。
 2. `shouldInterceptRequest`でメインフレームを再検証します。**WebViewからの直接POSTは許可しません**。この点がshouldOverrideだけの実装との差です。
@@ -60,3 +60,15 @@ IntentのactionがACTION_VIEWの場合だけdataの完全なURLを受け取り�
 URL入力ダイアログやQRの遅延結果が外部起動を上書きしないようにします。受信済みIntentのdataはActivityの現在のIntentから取り除き、保存状態からのActivity再生成時には旧URLを再送せず開始画面に戻ります。待機URLや了承状態を端末ストレージへ保存しません。Activity破棄後のCookieコールバックから閲覧を再開しません。
 
 標準ブラウザの選択は端末の設定からユーザーが行います。起動画面に設定メニューを追加せず、初期画面の2ボタンは維持します。HTTPフィルターはOSの検出のために受信するもので、平文通信の許可ではありません。Custom TabsサービスやACTION_SENDを実装するものではありません。
+
+## 初回HTTP転送と表示境界（0.3.0）
+
+InitialPageLoaderでGETを一度だけ準備します。NavigationGateway.fetchInitialは通常のfetchとは別の入口で、各ホップにUrlPolicyのHTTPS・検索エンジン等の検証を行ってから接続します。HTTPクライアントの自動転送は使いません。従来の転送回数上限10回も維持します。途中のCookieは各URLについてCookieManagerから取得し、元ホストのCookieヘッダー・Referer・Authorizationをそのまま別ホストへコピーしません。
+
+最初のHTMLを取得するまではWebView自体を作らず、読み込み状態と終了ボタンを表示します。レスポンスが決まったら、最終URLで新しい不変のUrlPolicyと通常のNavigationGatewayを持つBrowserSessionを作ります。CSP、origin限定ブリッジ、開始時注入スクリプト、URL判定はすべて最終originを使用します。HTMLを渡すより前に固定され、onPageFinishedまで制限を緩めるような時間帯はありません。
+
+取得済みのHTMLは、固定origin・GET・メインフレームの検証を通った最初のリクエストに一度だけ返します。WebViewがドット区間等を正規化しても初回GETを重複させないためです。初回の許可状態をWebViewへ持ち込まず、後のHTTP転送・フォーム送信は通常の厳格な取得処理だけを使います。初期HTMLのinline JavaScriptやmeta refreshが読み込み終了前に別ホストへ移動しようとしても拒否します。
+
+初回の準備中・失敗画面も閲覧中として扱い、別の外部リンクには確認を求めます。終了・切り替え・Activity破棄で初回処理を中止し、古い完了結果を画面へ反映しません。中止／終了とCookie更新を排他し、その後のCookie消去へ旧処理の更新を持ち越さないようにします。すでに始まったサーバー側処理を取り消す保証ではありません。
+
+最初のHTTP転送が成功しても、そのHTMLを表示した後に別ホストへの認証・注文・決済が必要なサイトは引き続き未対応です。詳細はINITIAL-REDIRECTS.mdを参照。

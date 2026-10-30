@@ -1,4 +1,4 @@
-/workspace/ai_restraint_android_browse/app/src/main/java/jp/example/restrictedbrowser/BrowserSession.java:48: Warning: Using setJavaScriptEnabled can introduce XSS vulnerabilities into your application, review carefully [SetJavaScriptEnabled]
+/workspace/ai_restraint_android_browse/app/src/main/java/jp/example/restrictedbrowser/BrowserSession.java:52: Warning: Using setJavaScriptEnabled can introduce XSS vulnerabilities into your application, review carefully [SetJavaScriptEnabled]
         s.setJavaScriptEnabled(true); s.setDomStorageEnabled(true);
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,5 +1,6 @@
 zipalign -c 4: PASS
 ZIP CRC integrity: PASS
 APK embedded guard.js matches source: PASS
-Compiled manifest contains MAIN / APP_BROWSER / VIEW / DEFAULT / BROWSABLE / http / https / singleTask: PASS (static inspection, not runtime resolution)
-Signing certificate matches v0.1 distribution: PASS
+Compiled manifest retains MAIN / APP_BROWSER / VIEW / DEFAULT / BROWSABLE / http / https / singleTask: PASS (static inspection, not runtime resolution)
+Signing certificate matches previous distributions: PASS
+Version: 0.3.0-test-debug / versionCode 3

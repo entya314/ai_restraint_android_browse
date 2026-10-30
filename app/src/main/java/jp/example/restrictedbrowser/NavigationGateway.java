@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -13,8 +12,10 @@ import java.util.Map;
 
 /** Owns document requests, including POST. No automatic redirects, custom TLS or certificate overrides. */
 public final class NavigationGateway {
+    static final int MAX_REDIRECTS = 10;
     public interface Cookies { String get(String url); void put(String url, String value); }
     public interface Connector { HttpURLConnection open(String url) throws IOException; }
+    interface RequestCheck { void check() throws IOException; }
     public static final class Page {
         public final String url;
         public final int status;
@@ -35,10 +36,24 @@ public final class NavigationGateway {
         this.policy = policy; this.cookies = cookies; this.userAgent = userAgent; this.connector = connector;
     }
     public Page fetch(String initial, String method, byte[] body, String contentType, String referer) throws IOException {
+        return fetch(initial, method, body, contentType, referer, false, () -> {});
+    }
+    /** Initial preparation is GET-only and separate from every WebView navigation/POST gateway. */
+    static Page fetchInitial(String initial, Cookies cookies, String userAgent, Connector connector,
+            RequestCheck active) throws IOException {
+        return new NavigationGateway(new UrlPolicy(initial), cookies, userAgent, connector)
+            .fetch(initial, "GET", null, null, null, true, active);
+    }
+    private Page fetch(String initial, String method, byte[] body, String contentType, String referer,
+            boolean initialGet, RequestCheck active) throws IOException {
         String url = initial;
         if (!(method.equals("GET") || method.equals("POST"))) throw new IOException("未対応の送信方法です。");
-        for (int hop = 0; hop < 11; hop++) {
-            if (!policy.allows(url)) throw new IOException("別ドメインへの移動を禁止しました。");
+        for (int hop = 0; hop <= MAX_REDIRECTS; hop++) {
+            active.check();
+            if (initialGet) {
+                try { UrlPolicy.parse(url); }
+                catch (IllegalArgumentException e) { throw new IOException(e.getMessage()); }
+            } else if (!policy.allows(url)) throw new IOException("別ドメインへの移動を禁止しました。");
             HttpURLConnection c = connector.open(url);
             try {
                 c.setInstanceFollowRedirects(false);
@@ -51,7 +66,7 @@ public final class NavigationGateway {
                 c.setRequestProperty("Cache-Control", "no-cache");
                 String cookie = cookies.get(url);
                 if (cookie != null && !cookie.isEmpty()) c.setRequestProperty("Cookie", cookie);
-                if (referer != null && policy.allows(referer)) c.setRequestProperty("Referer", referer);
+                if (!initialGet && referer != null && policy.allows(referer)) c.setRequestProperty("Referer", referer);
                 if (method.equals("POST")) {
                     c.setRequestProperty("Origin", policy.origin);
                     c.setDoOutput(true);
@@ -59,6 +74,7 @@ public final class NavigationGateway {
                     c.setFixedLengthStreamingMode(body.length);
                     try (var out = c.getOutputStream()) { out.write(body); }
                 }
+                active.check();
                 int status = c.getResponseCode();
                 Map<String, String> headers = new LinkedHashMap<>();
                 for (Map.Entry<String, List<String>> e : c.getHeaderFields().entrySet()) {
@@ -71,15 +87,18 @@ public final class NavigationGateway {
                     }
                 }
                 if (List.of(301, 302, 303, 307, 308).contains(status)) {
-                    if (hop == 10) throw new IOException("転送回数が多すぎます。");
-                    try { url = policy.resolveRedirect(url, c.getHeaderField("Location")); }
+                    if (hop == MAX_REDIRECTS) throw new IOException("転送回数が多すぎます。");
+                    try {
+                        url = initialGet ? UrlPolicy.resolveHttpsRedirect(url, c.getHeaderField("Location"))
+                            : policy.resolveRedirect(url, c.getHeaderField("Location"));
+                    }
                     catch (IllegalArgumentException e) { throw new IOException(e.getMessage()); }
                     if (status == 303 || ((status == 301 || status == 302) && method.equals("POST"))) {
                         method = "GET"; body = null; contentType = null;
                     }
                     continue;
                 }
-                if (status < 200 || status >= 600 || status == 204 || status == 205)
+                if (status < 200 || status >= 600 || (status >= 300 && status < 400) || status == 204 || status == 205)
                     throw new IOException("この応答は表示できません（HTTP " + status + "）。");
                 String type = headers.getOrDefault("content-type", "").toLowerCase(Locale.ROOT);
                 if (!(type.startsWith("text/html") || type.startsWith("application/xhtml+xml")) ||
@@ -89,8 +108,9 @@ public final class NavigationGateway {
                         (c.getContentEncoding() != null && !c.getContentEncoding().equalsIgnoreCase("identity")))
                     throw new IOException("未対応の圧縮形式です。");
                 // Enforced as a response header, before any author script; original CSP remains enforced too.
-                String extraCsp = "form-action " + policy.origin + "; frame-src " + policy.origin +
-                        "; object-src 'none'; base-uri " + policy.origin;
+                UrlPolicy documentPolicy = initialGet ? new UrlPolicy(url) : policy;
+                String extraCsp = "form-action " + documentPolicy.origin + "; frame-src " + documentPolicy.origin +
+                        "; object-src 'none'; base-uri " + documentPolicy.origin;
                 headers.merge("content-security-policy", extraCsp, (original, extra) -> original + ", " + extra);
                 headers.put("cache-control", "no-store");
                 headers.remove("refresh"); // Never honor server Refresh without navigation validation.
@@ -100,6 +120,7 @@ public final class NavigationGateway {
                 try (input; ByteArrayOutputStream output = new ByteArrayOutputStream()) {
                     byte[] buffer = new byte[8192]; int n;
                     while ((n = input.read(buffer)) != -1) {
+                        active.check();
                         if (output.size() + n > 8 * 1024 * 1024) throw new IOException("ページが大きすぎます。");
                         output.write(buffer, 0, n);
                     }

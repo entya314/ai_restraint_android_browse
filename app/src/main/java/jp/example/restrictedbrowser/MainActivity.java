@@ -11,6 +11,9 @@ import android.text.InputType;
 import android.webkit.CookieManager;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public final class MainActivity extends Activity {
     private BrowserSession session;
@@ -21,10 +24,14 @@ public final class MainActivity extends Activity {
     private AlertDialog externalLinkDialog;
     private AlertDialog urlDialog;
     private ExternalLinkCoordinator externalLinks;
+    private boolean browsing;
+    private InitialPageLoader initialLoad;
+    private Future<?> initialLoadFuture;
+    private final ExecutorService initialRequests = Executors.newSingleThreadExecutor();
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         externalLinks = new ExternalLinkCoordinator(new ExternalLinkCoordinator.Host() {
-            public boolean hasSession() { return session != null; }
+            public boolean hasSession() { return browsing; }
             public boolean isResetting() { return resetting; }
             public void dismissConfirmation() {
                 if (externalLinkDialog != null) { externalLinkDialog.dismiss(); externalLinkDialog = null; }
@@ -117,34 +124,82 @@ public final class MainActivity extends Activity {
         dialog.show();
     }
     private void open(String url) {
-        if (!ready()) return;
+        if (!ready() || browsing) return;
         try {
             // All entry paths are validated; no external Intent is ever passed to WebView directly.
-            UrlPolicy.parse(url);
+            UrlPolicy first = new UrlPolicy(url);
             ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(screen.getWindowToken(), 0);
-            session = new BrowserSession(this, url);
+            browsing = true;
             LinearLayout root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL);
             LinearLayout bar = new LinearLayout(this); bar.setGravity(Gravity.CENTER_VERTICAL);
             bar.setPadding(dp(16), 0, dp(8), 0); bar.setBackgroundColor(Color.rgb(246,248,245));
-            TextView host = new TextView(this); host.setText(session.domain()); host.setTextSize(16);
+            TextView host = new TextView(this); host.setText(first.host); host.setTextSize(16);
             host.setSingleLine(true); host.setEllipsize(android.text.TextUtils.TruncateAt.MIDDLE);
-            host.setContentDescription("利用中のドメイン " + session.domain());
+            host.setContentDescription("利用中のドメイン " + first.host);
             bar.addView(host, new LinearLayout.LayoutParams(0, dp(56), 1)); host.setGravity(Gravity.CENTER_VERTICAL);
             Button exit = button("終了"); exit.setTextSize(16);
             bar.addView(exit, new LinearLayout.LayoutParams(dp(84), dp(56)));
             root.addView(bar, new LinearLayout.LayoutParams(-1, dp(60)));
-            root.addView(session.web, new LinearLayout.LayoutParams(-1, 0, 1));
-            setContentView(root); exit.setOnClickListener(v -> resetSession()); session.open(url);
+            FrameLayout content = new FrameLayout(this);
+            root.addView(content, new LinearLayout.LayoutParams(-1, 0, 1));
+            showPageStatus(content, "読み込み中…");
+            setContentView(root); exit.setOnClickListener(v -> resetSession());
+            CookieManager cookies = CookieManager.getInstance();
+            cookies.setAcceptCookie(true);
+            InitialPageLoader loader = new InitialPageLoader(url, new NavigationGateway.Cookies() {
+                public String get(String target) { return cookies.getCookie(target); }
+                public void put(String target, String value) { cookies.setCookie(target, value); }
+            }, android.webkit.WebSettings.getDefaultUserAgent(this));
+            initialLoad = loader;
+            initialLoadFuture = initialRequests.submit(() -> {
+                try {
+                    NavigationGateway.Page page = loader.load();
+                    runOnUiThread(() -> {
+                        if (destroyed || initialLoad != loader) return;
+                        initialLoad = null; initialLoadFuture = null;
+                        try {
+                            // Bind before exposing HTML. No onPageFinished/onPageStarted grace period.
+                            session = new BrowserSession(this, page.url);
+                            host.setText(session.domain());
+                            host.setContentDescription("利用中のドメイン " + session.domain());
+                            content.removeAllViews();
+                            content.addView(session.web, new FrameLayout.LayoutParams(-1, -1));
+                            session.showInitialPage(page);
+                        } catch (Exception e) {
+                            if (session != null) { session.close(); session = null; }
+                            showPageStatus(content, "ページを開けませんでした。\n" + e.getMessage());
+                        }
+                    });
+                } catch (Exception e) {
+                    runOnUiThread(() -> {
+                        if (destroyed || initialLoad != loader) return;
+                        initialLoad = null; initialLoadFuture = null;
+                        showPageStatus(content, "ページを開けませんでした。\n" + e.getMessage());
+                    });
+                }
+            });
         } catch (Exception e) {
+            cancelInitialLoad(); browsing = false;
             if (session != null) { session.close(); session = null; }
             home(); Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+    private void showPageStatus(FrameLayout content, String message) {
+        content.removeAllViews();
+        TextView status = new TextView(this); status.setText(message); status.setGravity(Gravity.CENTER);
+        status.setPadding(dp(24), dp(24), dp(24), dp(24));
+        content.addView(status, new FrameLayout.LayoutParams(-1, -1));
+    }
+    private void cancelInitialLoad() {
+        if (initialLoad != null) { initialLoad.cancel(); initialLoad = null; }
+        if (initialLoadFuture != null) { initialLoadFuture.cancel(true); initialLoadFuture = null; }
     }
     private void resetSession() {
         resetSession(true);
     }
     private void resetSession(boolean clearExternal) {
         if (clearExternal) externalLinks.clear();
+        cancelInitialLoad(); browsing = false;
         if (session != null) { session.close(); session = null; }
         resetting = true; home();
         android.webkit.WebStorage.getInstance().deleteAllData();
@@ -170,13 +225,15 @@ public final class MainActivity extends Activity {
     @Override public void onBackPressed() {
         if (session != null) {
             if (session.web.canGoBack()) session.web.goBack(); else resetSession();
-        } else super.onBackPressed();
+        } else if (browsing) resetSession();
+        else super.onBackPressed();
     }
     @Override protected void onPause() { if (session != null) session.web.onPause(); super.onPause(); }
     @Override protected void onResume() { super.onResume(); if (session != null) session.web.onResume(); }
     @Override protected void onDestroy() {
         destroyed = true;
         externalLinks.close();
+        cancelInitialLoad(); initialRequests.shutdownNow();
         if (urlDialog != null) { urlDialog.dismiss(); urlDialog = null; }
         if (session != null) { session.close(); session = null; }
         super.onDestroy();

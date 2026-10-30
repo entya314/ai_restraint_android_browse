@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="jp.example.restrictedbrowser.NavigationGatewayTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-29T01:23:04" hostname="a948be1fb6ab" time="0.029">
+<testsuite name="jp.example.restrictedbrowser.NavigationGatewayTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-30T05:27:58" hostname="85263159b9e0" time="0.01">
   <properties/>
-  <testcase name="redirectChainCannotEscapeAfterAnAllowedHop" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.013"/>
-  <testcase name="postExternalRedirectIsStoppedBeforeDestinationForAllRedirectCodes" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.004"/>
+  <testcase name="redirectChainCannotEscapeAfterAnAllowedHop" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.002"/>
+  <testcase name="postExternalRedirectIsStoppedBeforeDestinationForAllRedirectCodes" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.002"/>
   <testcase name="redirectLoopIsBounded" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.004"/>
-  <testcase name="post307PreservesBodyAnd303BecomesGet" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.005"/>
-  <testcase name="directCrossOriginNeverConnects" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.001"/>
-  <testcase name="sameOriginGetRedirectAndSecurityHeaders" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.002"/>
+  <testcase name="post307PreservesBodyAnd303BecomesGet" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.001"/>
+  <testcase name="directCrossOriginNeverConnects" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.0"/>
+  <testcase name="sameOriginGetRedirectAndSecurityHeaders" classname="jp.example.restrictedbrowser.NavigationGatewayTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
